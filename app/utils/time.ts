@@ -28,7 +28,7 @@ export function formatDate(isoString: string): string {
   });
 }
 
-export function getTimeSlots(date: string): string[] {
+export function getTimeSlots(): string[] {
   const slots = [];
   for (let hour = 9; hour < 18; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
