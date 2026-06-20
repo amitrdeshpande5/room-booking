@@ -2,13 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { type ActionState } from "@/lib/types";
 import { localDateTimeToIso, minutesBetween } from "@/lib/time";
 
 const unavailableMessage = "That room is already booked for the selected time. Please choose another slot.";
+const setupMessage = "Supabase is not configured for this deployment.";
 
 export async function signIn(_previousState: ActionState, formData: FormData): Promise<ActionState> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, message: setupMessage };
+  }
+
   const supabase = await createClient();
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
@@ -23,6 +29,10 @@ export async function signIn(_previousState: ActionState, formData: FormData): P
 }
 
 export async function signUp(_previousState: ActionState, formData: FormData): Promise<ActionState> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, message: setupMessage };
+  }
+
   const supabase = await createClient();
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
@@ -37,6 +47,10 @@ export async function signUp(_previousState: ActionState, formData: FormData): P
 }
 
 export async function signOut() {
+  if (!isSupabaseConfigured()) {
+    redirect("/login");
+  }
+
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
@@ -46,6 +60,10 @@ export async function createBooking(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, message: setupMessage };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -116,6 +134,10 @@ export async function createBooking(
 }
 
 export async function cancelBooking(formData: FormData) {
+  if (!isSupabaseConfigured()) {
+    return;
+  }
+
   const supabase = await createClient();
   const id = String(formData.get("id") || "");
 
