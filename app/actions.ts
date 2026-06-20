@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { type ActionState } from "@/lib/types";
-import { localDateTimeToIso, minutesBetween } from "@/lib/time";
+import { istDateTimeToIso, minutesBetween } from "@/lib/time";
 
 const unavailableMessage = "That room is already booked for the selected time. Please choose another slot.";
 const setupMessage = "Supabase is not configured for this deployment.";
@@ -78,7 +78,6 @@ export async function createBooking(
   const start = String(formData.get("start_time") || "");
   const end = String(formData.get("end_time") || "");
   const purpose = String(formData.get("purpose") || "").trim();
-  const timezoneOffset = Number(formData.get("timezone_offset") || "0");
 
   if (!roomId || !date || !start || !end || !purpose) {
     return { ok: false, message: "Please complete every required field." };
@@ -88,8 +87,8 @@ export async function createBooking(
     return { ok: false, message: "End time must be after start time." };
   }
 
-  const startTime = localDateTimeToIso(date, start, timezoneOffset);
-  const endTime = localDateTimeToIso(date, end, timezoneOffset);
+  const startTime = istDateTimeToIso(date, start);
+  const endTime = istDateTimeToIso(date, end);
   const durationMinutes = minutesBetween(startTime, endTime);
 
   if (durationMinutes < 30 || durationMinutes > 8 * 60) {

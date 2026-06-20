@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState } from "react";
 import { createBooking } from "@/app/actions";
 import { type ActionState, type Room } from "@/lib/types";
 import { localDateInputValue, timeSlots } from "@/lib/time";
@@ -9,25 +9,14 @@ const initialState: ActionState = { ok: false, message: "" };
 
 export function BookingForm({ rooms }: { rooms: Room[] }) {
   const [state, formAction, isPending] = useActionState(createBooking, initialState);
-  const timezoneOffsetRef = useRef<HTMLInputElement>(null);
   const slots = timeSlots();
 
   return (
-    <form
-      action={formAction}
-      onSubmit={() => {
-        if (timezoneOffsetRef.current) {
-          timezoneOffsetRef.current.value = String(new Date().getTimezoneOffset());
-        }
-      }}
-      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
-    >
+    <form action={formAction} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-5">
         <h2 className="text-lg font-semibold text-slate-950">Book a room</h2>
-        <p className="mt-1 text-sm text-slate-500">Select a room and time slot for your meeting.</p>
+        <p className="mt-1 text-sm text-slate-500">Select a room and time slot in IST.</p>
       </div>
-
-      <input ref={timezoneOffsetRef} type="hidden" name="timezone_offset" defaultValue="0" />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
